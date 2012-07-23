@@ -1,0 +1,98 @@
+apply plugin: 'war'
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+apply from: 'build-version.gradle'
+apply from: 'build-dependencies.gradle'
+
+group = 'de.emesit'
+defaultTasks 'build'
+File generatedWebXmlFile = new File('build/webXml/web.xml')
+
+repositories {
+    mavenCentral()
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0'
+}
+
+war {
+    dependsOn 'generateWebXml'
+    webXml = generatedWebXmlFile
+}
+
+task generateWebXml << {
+    generatedWebXmlFile.parentFile.mkdirs()
+    List redmineDbs = loadRedmineConfig()
+    String webXml = buildWebXml(redmineDbs)
+    generatedWebXmlFile.text = webXml
+}
+
+List loadRedmineConfig() {
+    List redmineDbs = []
+    
+    def configFile = file('redmine-databases.groovy')
+    if (!configFile.exists()) {
+        throw new GradleException("!!!!!!!!!! Please create a configfile 'redmine-databases.groovy' !!!!!!!!!!.\nEither create from scratch or copy and rename the template 'redmine-databases.groovy.template'")
+    }
+    
+    def config = new ConfigSlurper().parse(configFile.toURL())
+    String globalJdbcUsername = config?.redmineDatabase?.jdbcUsername
+    String globalJdbcPassword = config?.redmineDatabase?.jdbcPassword
+    String globalJdbcDriver   = config?.redmineDatabase?.jdbcDriver
+
+    int i = 0
+    while (config?.redmineDatabase?."db$i") {
+        String name         = config?.redmineDatabase?."db$i"?.name
+        String jdbcUrl      = config?.redmineDatabase?."db$i"?.jdbcUrl
+        String jdbcUsername = config?.redmineDatabase?."db$i"?.jdbcUsername ?: globalJdbcUsername
+        String jdbcPassword = config?.redmineDatabase?."db$i"?.jdbcPassword ?: globalJdbcPassword
+        String jdbcDriver   = config?.redmineDatabase?."db$i"?.jdbcDriver   ?: globalJdbcDriver
+        redmineDbs << [name:name, jdbcUrl:jdbcUrl, jdbcUsername:jdbcUsername, jdbcPassword:jdbcPassword, jdbcDriver:jdbcDriver]
+        i++
+    }
+    return redmineDbs
+}
+
+String buildWebXml(List redmineDbs) {
+    StringWriter sw = new StringWriter()
+    groovy.xml.MarkupBuilder builder = new groovy.xml.MarkupBuilder(sw)
+    builder.'web-app' {
+        'servlet' {
+            'servlet-name'('MissApiServlet')
+            'servlet-class'('de.emesit.redmine.api.MissApiServlet')
+            for (int i = 0; i < redmineDbs.size(); i++) {
+                buildInitParam(builder, "redmineDatabase.${i}.name"        , redmineDbs[i].name)
+                buildInitParam(builder, "redmineDatabase.${i}.jdbcUrl"     , redmineDbs[i].jdbcUrl)
+                buildInitParam(builder, "redmineDatabase.${i}.jdbcUsername", redmineDbs[i].jdbcUsername)
+                buildInitParam(builder, "redmineDatabase.${i}.jdbcPassword", redmineDbs[i].jdbcPassword)
+                buildInitParam(builder, "redmineDatabase.${i}.jdbcDriver"  , redmineDbs[i].jdbcDriver)
+            }
+        }
+        'servlet-mapping' {
+            'servlet-name'('MissApiServlet')
+            'url-pattern' ('/*')
+        }
+    }
+    return xmlDeclaration()+"\n"+webAppDtd()+"\n"+sw.toString()
+}
+
+void buildInitParam(def builder, String name, String value) {
+    builder.'init-param' {
+        'param-name'(name)
+        'param-value'(value)
+    }
+}
+
+
+def xmlDeclaration() {
+    '<?xml version="1.0" encoding="UTF-8"?>'
+}
+
+def webAppDtd() {
+    '''<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">'''
+}
+

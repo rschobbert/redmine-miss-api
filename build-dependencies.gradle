@@ -1,0 +1,14 @@
+dependencies {
+    groovy           group:'org.codehaus.groovy', name:'groovy'      , version:'1.7.3'
+    compile          group:'org.slf4j'          , name:'slf4j-api'   , version:'1.6.6'
+    
+    runtime          group:'ch.qos.logback'     , name:'logback-classic'     , version:'1.0.6'
+    // if you rather use slf4j-simple as a slf4j-api implementation, comment or remove the previous entry 'logback' and add the following:
+    //runtime          group:'org.slf4j'          , name:'slf4j-simple', version:'1.6.6'
+    
+    providedCompile  group:'javax.servlet'      , name:'servlet-api' , version:'2.3'
+    
+    // If you want to include the JDBC driver in your webapps WEB-INF/lib folder you may want to add something like the following
+    //runtime group:'mysql', name:'mysql-connector-java', version:'5.1.21'
+    // You might as well just add the JDBC driver JAR to your containers lib folder
+}

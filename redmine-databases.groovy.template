@@ -1,0 +1,15 @@
+redmineDatabase {
+    jdbcUsername = 'myUsername'
+    jdbcPassword = 'myPassword'
+    jdbcDriver = 'com.mysql.jdbc.Driver'
+    db0 {
+        name = 'production'
+        jdbcUrl = 'jdbc:mysql://localhost/redmine-production'
+    }
+    db1 {
+        name = 'development'
+        jdbcUrl = 'jdbc:mysql://localhost/redmine-development'
+        jdbcUsername = 'someOtherUsername'
+        jdbcPassword = 'someOtherPassword'
+    }
+}

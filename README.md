@@ -6,6 +6,7 @@ A webapp which can be used to serve some missing redmine REST API resources. Cur
 * enumerations
 
 The information is deliviered with the MIME type 'application/xml'.
+*Caution: this webapp is dependent on the underlying redmine database layout, currently redmine 1.4.4 works for sure. Others might work, check your database tables against the layout described in the section 'Technical Information'*
 
 Create a customized version and deploy
 --------------------------------------
@@ -48,8 +49,40 @@ and for enumerations:
 
 
 
-Technical information
+Technical Information
 =====================
 
 This project is written in groovy. It uses gradle as a build system, and has the gradle wrapper task active - therefore no installation of gradle
 is necessary to run the build.
+This webapp works for redmine 1.4.4 database layout, but may also work with other versions. Redmine 1.4.4 has the following database tables:
+* table CUSTOM_FIELDS:
+| Field           | Type         | Null | Key | Default | Extra          |
+|:----------------|:-------------|:----:|:---:|:--------|:--------------:|
+| id              | int(11)      | NO   | PRI | NULL    | auto_increment |
+| type            | varchar(30)  | NO   |     |         |                |
+| name            | varchar(30)  | NO   |     |         |                |
+| field_format    | varchar(30)  | NO   |     |         |                |
+| possible_values | text         | YES  |     | NULL    |                |
+| regexp          | varchar(255) | YES  |     |         |                |
+| min_length      | int(11)      | NO   |     | 0       |                |
+| max_length      | int(11)      | NO   |     | 0       |                |
+| is_required     | tinyint(1)   | NO   |     | 0       |                |
+| is_for_all      | tinyint(1)   | NO   |     | 0       |                |
+| is_filter       | tinyint(1)   | NO   |     | 0       |                |
+| position        | int(11)      | YES  |     | 1       |                |
+| searchable      | tinyint(1)   | YES  |     | 0       |                |
+| default_value   | text         | YES  |     | NULL    |                |
+| editable        | tinyint(1)   | YES  |     | 1       |                |
+| visible         | tinyint(1)   | NO   |     | 1       |                |
+| multiple        | tinyint(1)   | YES  |     | 0       |                |
+* table ENUMERATIONS:
+| Field      | Type         | Null | Key | Default | Extra          |
+|:-----------|:-------------|:----:|:---:|:--------|:--------------:|
+| id         | int(11)      | NO   | PRI | NULL    | auto_increment |
+| name       | varchar(30)  | NO   |     |         |                |
+| position   | int(11)      | YES  |     | 1       |                |
+| is_default | tinyint(1)   | NO   |     | 0       |                |
+| type       | varchar(255) | YES  |     | NULL    |                |
+| active     | tinyint(1)   | NO   |     | 1       |                |
+| project_id | int(11)      | YES  | MUL | NULL    |                |
+| parent_id  | int(11)      | YES  |     | NULL    |                |

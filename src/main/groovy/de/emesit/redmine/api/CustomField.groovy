@@ -7,7 +7,7 @@ import groovy.xml.MarkupBuilder;
 
 class CustomField {
     /*
-    Currently (redmine 1.4.4) the CUSTOMFIELDS table is defined like this:
+    Currently (redmine 1.4.4) the CUSTOM_FIELDS table is defined like this:
     +-----------------+--------------+------+-----+---------+----------------+
     | Field           | Type         | Null | Key | Default | Extra          |
     +-----------------+--------------+------+-----+---------+----------------+

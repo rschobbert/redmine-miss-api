@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
  * <p>
  * A servlet which can be used to serve information on redmine custom fields or enumerations.
  * At the time of writing there is no built-in possibility in redmine to query
- * the configured custom fields. To build a REST API I needed this possibility 
+ * the configured custom fields or enumerations. To build a REST API I needed this possibility 
  * and therefore wrote this servlet.
  * </p>
  * <p>
@@ -131,7 +131,7 @@ class MissApiServlet extends HttpServlet {
     
     @Override
     void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        println "pathInfo="+request.pathInfo
+        LOG.debug "Received request for pathInfo=${request.pathInfo}"
         
         String location = request.getParameter(PARAM_LOCATION)
         boolean reload = request.getParameter(PARAM_RELOAD) != null
@@ -148,9 +148,11 @@ class MissApiServlet extends HttpServlet {
                     
                     String xmlAnswer = ''
                     if (request.pathInfo == '/custom_fields') {
+                        LOG.debug "Querying ${request.pathInfo} in redmineDatabase $redmineDatabase"
                         List<CustomField> customFieldsOfType = redmineDatabase.getCustomFields(typeParam, reload)
                         xmlAnswer = CustomField.toXml(customFieldsOfType)
                     } else if (request.pathInfo == '/enumerations') {
+                        LOG.debug "Querying ${request.pathInfo} in redmineDatabase $redmineDatabase"
                         List<Enumeration> enumerationsOfType = redmineDatabase.getEnumerations(typeParam, reload)
                         xmlAnswer = Enumeration.toXml(enumerationsOfType)
                     }

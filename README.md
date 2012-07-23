@@ -56,6 +56,7 @@ This project is written in groovy. It uses gradle as a build system, and has the
 is necessary to run the build.
 This webapp works for redmine 1.4.4 database layout, but may also work with other versions. Redmine 1.4.4 has the following database tables:
 * table CUSTOM_FIELDS:
+
 | Field           | Type         | Null | Key | Default | Extra          |
 |:----------------|:-------------|:----:|:---:|:--------|:--------------:|
 | id              | int(11)      | NO   | PRI | NULL    | auto_increment |
@@ -75,7 +76,10 @@ This webapp works for redmine 1.4.4 database layout, but may also work with othe
 | editable        | tinyint(1)   | YES  |     | 1       |                |
 | visible         | tinyint(1)   | NO   |     | 1       |                |
 | multiple        | tinyint(1)   | YES  |     | 0       |                |
+
+
 * table ENUMERATIONS:
+
 | Field      | Type         | Null | Key | Default | Extra          |
 |:-----------|:-------------|:----:|:---:|:--------|:--------------:|
 | id         | int(11)      | NO   | PRI | NULL    | auto_increment |

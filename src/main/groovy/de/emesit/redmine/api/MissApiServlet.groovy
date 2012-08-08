@@ -147,14 +147,22 @@ class MissApiServlet extends HttpServlet {
                     String typeParam = request.getParameter(PARAM_TYPE)
                     
                     String xmlAnswer = ''
-                    if (request.pathInfo == '/custom_fields') {
-                        LOG.debug "Querying ${request.pathInfo} in redmineDatabase $redmineDatabase"
+                    
+                    String resourceType = request.pathInfo
+                    if (resourceType) {
+                        resourceType -= '/'
+                        resourceType -= '.xml'
+                    }
+                    if (resourceType == 'custom_fields') {
+                        LOG.debug "Querying ${resourceType} in redmineDatabase $redmineDatabase"
                         List<CustomField> customFieldsOfType = redmineDatabase.getCustomFields(typeParam, reload)
                         xmlAnswer = CustomField.toXml(customFieldsOfType)
-                    } else if (request.pathInfo == '/enumerations') {
-                        LOG.debug "Querying ${request.pathInfo} in redmineDatabase $redmineDatabase"
+                    } else if (resourceType == 'enumerations') {
+                        LOG.debug "Querying ${resourceType} in redmineDatabase $redmineDatabase"
                         List<Enumeration> enumerationsOfType = redmineDatabase.getEnumerations(typeParam, reload)
                         xmlAnswer = Enumeration.toXml(enumerationsOfType)
+                    } else {
+                        LOG.debug "Unrecognized resourceType ${resourceType}, pathInfo was ${request.pathInfo}"
                     }
                     LOG.debug "xmlAnswer = $xmlAnswer"
                     response.contentType = RESPONSE_MIME_TYPE
